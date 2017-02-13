@@ -13,7 +13,6 @@ namespace SampleWebApiAspNetCore.Controllers
     [Route("api/[controller]")]
     public class MoviesController : Controller
     {
-        //private readonly IMoviesMapper _MoviesMapper;
         private readonly IMoviesRepository _MoviesRepository;
 
         public MoviesController(
@@ -31,160 +30,105 @@ namespace SampleWebApiAspNetCore.Controllers
             }
             catch (Exception exception)
             {
-                //logg exception or do anything with it
+                Console.Write(exception.ToString());
                 return StatusCode((int) HttpStatusCode.InternalServerError);
             }
         }
 
-        /*[HttpGet("{id:int}", Name = "GetSingleMovies")]
-        public IActionResult GetSingle(int id)
+        [HttpGet("{id:int}", Name = "GetSingleMovies")]
+        public async Task<IActionResult> GetSingle(int id)
         {
             try
             {
-                MovieEntity MovieEntity = _MoviesRepository.GetSingle(id);
+                MovieEntity MovieEntity = await _MoviesRepository.GetSingle(id);
 
                 if (MovieEntity == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(_MoviesMapper.MapToDto(MovieEntity));
+                return Ok(MovieEntity);
             }
             catch (Exception exception)
             {
-                //logg exception or do anything with it
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        [HttpPatch("{id:int}")]
-        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<MovieDto> MoviesPatchDocument)
-        {
-            try
-            {
-                if (MoviesPatchDocument == null)
-                {
-                    return BadRequest();
-                }
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                MovieEntity MovieEntity = _MoviesRepository.GetSingle(id);
-
-                if (MovieEntity == null)
-                {
-                    return NotFound();
-                }
-
-                MovieDto existingMovies = _MoviesMapper.MapToDto(MovieEntity);
-
-                MoviesPatchDocument.ApplyTo(existingMovies, ModelState);
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                _MoviesRepository.Update(_MoviesMapper.MapToEntity(existingMovies));
-
-                return Ok(existingMovies);
-            }
-            catch (Exception exception)
-            {
-                //logg exception or do anything with it
+                Console.Write(exception.ToString());
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] MovieDto MovieDto)
+        public async Task<IActionResult> Create([FromBody] MovieEntity MovieEntity)
         {
             try
             {
-                if (MovieDto == null)
+                if (MovieEntity == null)
                 {
                     return BadRequest();
                 }
 
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                MovieEntity MovieEntity = _MoviesMapper.MapToEntity(MovieDto);
-
-                _MoviesRepository.Add(MovieEntity);
+                await _MoviesRepository.Add(MovieEntity);
    
-                return CreatedAtRoute("GetSingleMovies", new { id = MovieEntity.Id }, _MoviesMapper.MapToDto(MovieEntity));
+                return CreatedAtRoute("GetSingleMovies", new { id = MovieEntity.Id }, MovieEntity);
             }
             catch (Exception exception)
             {
-                //logg exception or do anything with it
+                Console.Write(exception.ToString());
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult Update(int id, [FromBody] MovieDto MovieDto)
+        public async Task<IActionResult> Update(int id, [FromBody] MovieEntity movieEntity)
         {
             try
             {
-                if (MovieDto == null)
+                if (movieEntity == null)
                 {
                     return BadRequest();
                 }
 
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+                MovieEntity movieEntityToUpdate = await _MoviesRepository.GetSingle(id);
 
-                MovieEntity MovieEntityToUpdate = _MoviesRepository.GetSingle(id);
-
-                if (MovieEntityToUpdate == null)
+                if (movieEntityToUpdate == null)
                 {
                     return NotFound();
                 }
 
-                MovieEntityToUpdate.ZipCode = MovieDto.ZipCode;
-                MovieEntityToUpdate.Street = MovieDto.Street;
-                MovieEntityToUpdate.City = MovieDto.City;
+                movieEntityToUpdate.Title = movieEntity.Title;
+                movieEntityToUpdate.Director = movieEntity.Director;
 
-                _MoviesRepository.Update(MovieEntityToUpdate);
+                await _MoviesRepository.Update(movieEntityToUpdate);
 
-                return Ok(_MoviesMapper.MapToDto(MovieEntityToUpdate));
+                return Ok(movieEntityToUpdate);
             }
             catch (Exception exception)
             {
-                //logg exception or do anything with it
+                Console.Write(exception.ToString());
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                MovieEntity MovieEntityToDelete = _MoviesRepository.GetSingle(id);
+                MovieEntity MovieEntityToDelete = await _MoviesRepository.GetSingle(id);
 
                 if (MovieEntityToDelete == null)
                 {
                     return NotFound();
                 }
 
-                _MoviesRepository.Delete(id);
+                await _MoviesRepository.Delete(id);
 
                 return NoContent();
             }
             catch (Exception exception)
             {
-                //logg exception or do anything with it
+                Console.Write(exception.ToString());
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
-        }*/
+        }
     }
 }

@@ -28,6 +28,7 @@
     "netcoreapp1.1": {}
   },
   "buildOptions": {
+    "debugType": "portable",
     "emitEntryPoint": true,
     "preserveCompilationContext": true
   },

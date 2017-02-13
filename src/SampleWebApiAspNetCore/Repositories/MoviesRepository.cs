@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 namespace SampleWebApiAspNetCore.Repositories
 {
     public class MoviesRepository : IMoviesRepository
@@ -20,37 +21,34 @@ namespace SampleWebApiAspNetCore.Repositories
             return await _context.Movies.ToListAsync();
         }
 
-        /*
-
-        public MovieEntity GetSingle(int id)
+        public async Task<MovieEntity> GetSingle(int id)
         {
-            return _Moviess.FirstOrDefault(x => x.Key == id).Value;
+            return await _context.Movies.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public MovieEntity Add(MovieEntity toAdd)
+        
+        public async Task<MovieEntity> Add(MovieEntity newMovie)
         {
-            int newId = !GetAll().Any() ? 1 : GetAll().Max(x => x.Id) + 1;
-            toAdd.Id = newId;
-            _Moviess.Add(newId, toAdd);
-            return toAdd;
+             _context.Movies.Add(newMovie);
+             await _context.SaveChangesAsync();
+             return newMovie;
         }
 
-        public MovieEntity Update(MovieEntity toUpdate)
+        public async Task<MovieEntity> Update(MovieEntity toUpdate)
         {
-            MovieEntity single = GetSingle(toUpdate.Id);
+            if (toUpdate == null)  return null; 
 
-            if (single == null)
-            {
-                return null;
-            }
-
-            _Moviess[single.Id] = toUpdate;
+            _context.Movies.Update(toUpdate);
+            await _context.SaveChangesAsync();
             return toUpdate;
         }
 
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
-            _Moviess.Remove(id);
-        }*/
+            MovieEntity model = await GetSingle(id);
+            _context.Movies.Remove(model);
+            await _context.SaveChangesAsync();
+        }
+        
     }
 }
